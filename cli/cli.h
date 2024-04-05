@@ -22,7 +22,7 @@ enum cli_color {
 #define cli_clear()             printf("\033[H\033[J")                  /* clear screen and put cursor at (0,0) */
 #define cli_reset()             printf("\033[0m")                       /* reset formating */
 
-#define cli_goto(R, C)          printf("\033[%d;%dH")                   /* move cursor to row r and col c */
+#define cli_goto(R, C)          printf("\033[%d;%dH", R, C)             /* move cursor to row r and col c */
 
 #define cli_set_fg(color)       printf("\033[3%dm", color)              /* set text color (basic terminal colors) */
 #define cli_set_bg(color)       printf("\033[4%dm", color)              /* set backgroung color (basic terminal colors) */
