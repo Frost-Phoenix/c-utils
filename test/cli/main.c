@@ -1,4 +1,4 @@
-#include "cli.h"
+#include "../../cli/cli.h"
 
 
 int main(void) {
