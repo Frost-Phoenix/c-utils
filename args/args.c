@@ -35,8 +35,6 @@ static void priv_check_options(args_t* args) {
 void args_init(args_t* args, const args_option_t* options, const int nb_options, const int argc, const char** argv, const char* help) {
     memset(args, 0, sizeof(args_t));
 
-    printf("%d\n", nb_options);
-
     args->options = options;
     args->nb_options = nb_options;
     args->argc = argc;
@@ -48,5 +46,11 @@ void args_init(args_t* args, const args_option_t* options, const int nb_options,
 }
 
 void args_parse(args_t* args) {
+    int i = 0;
+    while (args->argc) {
+        printf("%s\n", args->argv[i]);
 
+        args->argc--;
+        i++;
+    }
 }
