@@ -16,6 +16,7 @@ enum error_type {
     ERROR_WRONG_OPTION_TYPE,
     ERROR_OPT_SHORT,
     ERROR_OPT_LONG,
+    ERROR_OPT_UNKNOWN,
 };
 
 
@@ -24,14 +25,19 @@ enum error_type {
  ******************************************************/
 
 static void priv_error(args_t* args, const args_option_t* option, const char* reason, enum error_type cause) {
-    if (cause == ERROR_NULL_POINTER) {
-        fprintf(stderr, "\033[31merror:\033[0m option value is a NULL pointer\n");
-    } else if (cause == ERROR_WRONG_OPTION_TYPE) {
-        fprintf(stderr, "\033[31merror:\033[0m wrong option type: %d\n", option->type);
-    } else if (ERROR_OPT_SHORT) {
-        fprintf(stderr, "\033[31merror:\033[0m option `-%c` %s\n", option->short_name, reason);
-    } else if (ERROR_OPT_LONG) {
-        fprintf(stderr, "\033[31merror:\033[0m option `--%s` %s\n", option->long_name, reason);
+    switch (cause) {
+        case ERROR_NULL_POINTER:
+            fprintf(stderr, "\033[31merror:\033[0m option value is a NULL pointer\n"); break;
+        case ERROR_WRONG_OPTION_TYPE:
+            fprintf(stderr, "\033[31merror:\033[0m wrong option type: %d\n", option->type); break;
+        case ERROR_OPT_SHORT:
+            fprintf(stderr, "\033[31merror:\033[0m option `-%c` %s\n", option->short_name, reason); break;
+        case ERROR_OPT_LONG:
+            fprintf(stderr, "\033[31merror:\033[0m option `--%s` %s\n", option->long_name, reason); break;
+        case ERROR_OPT_UNKNOWN:
+            fprintf(stderr, "\033[31merror:\033[0m unknown option `%s`\n", *args->argv); break;
+        default:
+            break;
     }
     printf("Try '%s --help' for more information.\n", args->name);
     exit(EXIT_FAILURE);
@@ -90,8 +96,11 @@ static void priv_short_opt(args_t* args, const char opt) {
     for (;options->type != OPT_END; options++) {
         if (options->short_name == opt) {
             priv_get_value(args, options);
+            return;
         }
     }
+
+    priv_error(args, options, NULL, ERROR_OPT_UNKNOWN);
 }
 
 
