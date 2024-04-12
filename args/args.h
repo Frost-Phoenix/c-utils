@@ -2,12 +2,11 @@
 #define ARGS_H
 
 
+#define OPTION_END() {OPT_END, 0, 0, NULL}
 #define OPTION_HELP()            {OPT_HELP, 'h', "help", NULL}
 #define OPTION_BOOL(S, L, VAL)   {OPT_BOOL,   S, L, VAL}
 #define OPTION_INT(S, L, VAL)    {OPT_INT,    S, L, VAL}
 #define OPTION_STRING(S, L, VAL) {OPT_STRING, S, L, VAL}
-
-#define GET_NB_OPTIONS(OPTIONS) (sizeof(OPTIONS) / sizeof(args_option_t))
 
 
 typedef enum args_option_type {
@@ -15,6 +14,7 @@ typedef enum args_option_type {
     OPT_INT,
     OPT_STRING,
     OPT_HELP,
+    OPT_END,
 } args_option_type_t;
 
 typedef struct args_option {
@@ -27,7 +27,6 @@ typedef struct args_option {
 } args_option_t;
 
 typedef struct args {
-    int nb_options;
     const args_option_t* options;
 
     int argc;
@@ -38,7 +37,7 @@ typedef struct args {
 } args_t;
 
 
-void args_init(args_t* args, const args_option_t* options, const int nb_options, const int argc, const char** argv, const char* help);
+void args_init(args_t* args, const args_option_t* options, const int argc, const char** argv, const char* help);
 void args_parse(args_t* args);
 
 
