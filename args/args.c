@@ -75,6 +75,8 @@ static int priv_get_opt_type(const char* opt) {
 }
 
 static void priv_get_value(args_t* args, const args_option_t* option) {
+    enum error_type error = priv_get_opt_type(args->argv[0]) == OPT_SHORT ? ERROR_OPT_SHORT : ERROR_OPT_LONG;
+
     switch (option->type) {
         case OPT_BOOL:
             *(int*)option->val = 1;
@@ -82,6 +84,12 @@ static void priv_get_value(args_t* args, const args_option_t* option) {
         case OPT_INT:
             break;
         case OPT_STRING:
+            if (args->argc < 2) {
+                priv_error(args, option, "requires a value", error);
+            }
+            args->argv++;
+            args->argc--;
+            *(const char**)option->val = args->argv[0];
             break;
         case OPT_HELP:
             break;
