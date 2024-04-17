@@ -103,6 +103,19 @@ static void priv_short_opt(args_t* args, const char opt) {
     priv_error(args, options, NULL, ERROR_OPT_UNKNOWN);
 }
 
+static void priv_long_opt(args_t* args, const char* opt) {
+    const args_option_t* options = args->options;
+
+    for (;options->type != OPT_END; options++) {
+        if (strcmp(options->long_name, opt) == 0) {
+            priv_get_value(args, options);
+            return;
+        }
+    }
+
+    priv_error(args, options, NULL, ERROR_OPT_UNKNOWN);
+}
+
 
 /******************************************************
  *                 Public functions                   *
@@ -136,6 +149,8 @@ void args_parse(args_t* args) {
                 }
                 break;
             case OPT_LONG:
+                opt += 2;
+                priv_long_opt(args, opt);
                 break;
             case OPT_NON_OPTION:
                 break;
