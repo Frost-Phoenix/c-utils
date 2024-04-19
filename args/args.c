@@ -118,7 +118,8 @@ static void priv_get_value(args_t* args, const args_option_t* option) {
             *(const char**)option->val = args->argv[0];
             break;
         case OPT_HELP:
-            break;
+            printf("%s\n", *(char**)option->val);
+            exit(EXIT_SUCCESS);
         default:
             break;
     }
