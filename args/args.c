@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 
 #define OPT_SHORT                 1
@@ -23,6 +24,23 @@ enum error_type {
 /******************************************************
  *                 Private functions                  *
  ******************************************************/
+
+static int priv_to_int(const char* str, int* out) {
+    char* end;
+    long res;
+
+    res = strtol(str, &end, 10);
+
+    if (str[0] == '\0' || str[0] == ' '
+        || res > INT_MAX || res < INT_MIN
+        || *end != '\0') {
+        return -1;
+    }
+
+    *out = (int)res;
+
+    return 0;
+}
 
 static void priv_error(args_t* args, const args_option_t* option, const char* reason, enum error_type cause) {
     switch (cause) {
@@ -82,6 +100,14 @@ static void priv_get_value(args_t* args, const args_option_t* option) {
             *(int*)option->val = 1;
             break;
         case OPT_INT:
+            if (args->argc < 2) {
+                priv_error(args, option, "requires a value", error);
+            }
+            args->argv++;
+            args->argc--;
+            if (priv_to_int(args->argv[0], (int*)option->val) != 0) {
+                priv_error(args, option, "not a valid int", error);
+            }
             break;
         case OPT_STRING:
             if (args->argc < 2) {
