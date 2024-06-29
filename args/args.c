@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 
 #define OPT_SHORT                 1
@@ -23,6 +24,23 @@ enum error_type {
 /******************************************************
  *                 Private functions                  *
  ******************************************************/
+
+static int priv_to_int(const char* str, int* out) {
+    char* end;
+    long res;
+
+    res = strtol(str, &end, 10);
+
+    if (str[0] == '\0' || str[0] == ' '
+        || res > INT_MAX || res < INT_MIN
+        || *end != '\0') {
+        return -1;
+    }
+
+    *out = (int)res;
+
+    return 0;
+}
 
 static void priv_error(args_t* args, const args_option_t* option, const char* reason, enum error_type cause) {
     switch (cause) {
@@ -75,16 +93,33 @@ static int priv_get_opt_type(const char* opt) {
 }
 
 static void priv_get_value(args_t* args, const args_option_t* option) {
+    enum error_type error = priv_get_opt_type(args->argv[0]) == OPT_SHORT ? ERROR_OPT_SHORT : ERROR_OPT_LONG;
+
     switch (option->type) {
         case OPT_BOOL:
             *(int*)option->val = 1;
             break;
         case OPT_INT:
+            if (args->argc < 2) {
+                priv_error(args, option, "requires a value", error);
+            }
+            args->argv++;
+            args->argc--;
+            if (priv_to_int(args->argv[0], (int*)option->val) != 0) {
+                priv_error(args, option, "not a valid int", error);
+            }
             break;
         case OPT_STRING:
+            if (args->argc < 2) {
+                priv_error(args, option, "requires a value", error);
+            }
+            args->argv++;
+            args->argc--;
+            *(const char**)option->val = args->argv[0];
             break;
         case OPT_HELP:
-            break;
+            printf("%s\n", *(char**)option->val);
+            exit(EXIT_SUCCESS);
         default:
             break;
     }
@@ -95,6 +130,19 @@ static void priv_short_opt(args_t* args, const char opt) {
 
     for (;options->type != OPT_END; options++) {
         if (options->short_name == opt) {
+            priv_get_value(args, options);
+            return;
+        }
+    }
+
+    priv_error(args, options, NULL, ERROR_OPT_UNKNOWN);
+}
+
+static void priv_long_opt(args_t* args, const char* opt) {
+    const args_option_t* options = args->options;
+
+    for (;options->type != OPT_END; options++) {
+        if (strcmp(options->long_name, opt) == 0) {
             priv_get_value(args, options);
             return;
         }
@@ -136,6 +184,8 @@ void args_parse(args_t* args) {
                 }
                 break;
             case OPT_LONG:
+                opt += 2;
+                priv_long_opt(args, opt);
                 break;
             case OPT_NON_OPTION:
                 break;

@@ -3,7 +3,7 @@
 
 
 #define OPTION_END() {OPT_END, 0, 0, NULL}
-#define OPTION_HELP()            {OPT_HELP, 'h', "help", NULL}
+#define OPTION_HELP(VAL)            {OPT_HELP, 'h', "help", VAL}
 #define OPTION_BOOL(S, L, VAL)   {OPT_BOOL,   S, L, VAL}
 #define OPTION_INT(S, L, VAL)    {OPT_INT,    S, L, VAL}
 #define OPTION_STRING(S, L, VAL) {OPT_STRING, S, L, VAL}
