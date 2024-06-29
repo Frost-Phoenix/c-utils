@@ -35,6 +35,7 @@ int main(void) {
 
     printf("press a key to quit\n");
     while (!cli_kbhit()) { }
+    getchar();
 
     cli_set_buffred_inputs(1);
 
